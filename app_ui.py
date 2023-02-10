@@ -13,7 +13,9 @@ from PyQt5.QtWidgets import (
 
 import ticket
 
-
+"""
+Main Application User Interface
+"""
 class Window(QWidget):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
