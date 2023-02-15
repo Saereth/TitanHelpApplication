@@ -45,6 +45,22 @@ class JSONTicketSchema(ma.Schema):
 jsonticket_schema = JSONTicketSchema(strict=True)
 jsontickets_schema = JSONTicketSchema(many=True,strict=True)
 
+#Define App Routes for basic CRUD
+
+#Create Ticket
+@app.route('/ticket', methods=['POST'])
+def add_ticket():
+    name = request.json['name']
+    description = request.json['descripion']
+    date = request.json['date']
+
+    new_jsonticket = JSONTicket(name,description,date)
+    db.session.add(new_jsonticket)
+    db.session.commit()
+
+    return JSONTicketSchema.jsonify(new_jsonticket)
+
+
 #Run the microservice
 if __name__ == '__main__':
     app.run(debug=True)
