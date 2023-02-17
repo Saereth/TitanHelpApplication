@@ -58,6 +58,7 @@ class Ui_ticket_system(object):
         """ Connect to titanhelp.db """
         connect = sqlite3.connect('titanhelp.db')
 
+        #Ui_ticket_system.show()
     def retranslateUi(self, ticket_system):
         _translate = QtCore.QCoreApplication.translate
         ticket_system.setWindowTitle(_translate("Ticket Window", "List of Available tickets"))
@@ -71,19 +72,14 @@ class Ui_ticket_system(object):
         date_item = self.tableWidget.horizontalHeaderItem(3)
         date_item.setText(_translate('Ticket Window', 'Date'))
 
-    """ Name of ticket """
 
-    """ Navigation """
+    print('ticket.py')
 
-    """ Page number """
-
-    print('ticket form')
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    ticket_system = QtWidgets.QMainWindow()
-    ui = Ui_ticket_system()
-    ui.setupUi(ticket_system)
-    ticket_system.show()
-    sys.exit(app.exec_())
+#if __name__ == "__main__":
+import sys
+app = QtWidgets.QApplication(sys.argv)
+ticket_system = QtWidgets.QMainWindow()
+ui = Ui_ticket_system()
+ui.setupUi(ticket_system)
+ticket_system.show()
+sys.exit(app.exec_())

@@ -10,8 +10,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QWidget, QPushButton )
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSql
 from PyQt5.QtCore import Qt
-from ticket import ticket_system
-import ticket
+#from ticket import Ui_ticket_system
 import db_test
 
 """
@@ -59,15 +58,22 @@ class Window(QWidget, QtCore.QAbstractTableModel):
 
         """ List of Tickets """
         # open list of tickets in new paginated window
-
+        def open_current_tickets():
+            from ticket import Ui_ticket_system
+            #import ticket
+            print('Ticket button clicked')
+        open_tickets_btn = QPushButton('View Tickets')
+        open_tickets_btn.clicked.connect(open_current_tickets)
+        layout.addWidget(open_tickets_btn)
 
         """New ticket button"""
         def create_form_win():
+            #from ticket import Ui_ticket_system
+            #import ticket
             print('new form clicked')
-            ticket
+
         new_ticket_btn = QPushButton("Create Ticket")
         new_ticket_btn.clicked.connect(create_form_win)
-
         layout.addWidget(new_ticket_btn)
         #layout.addWidget(ticket_list_widget)
 
@@ -75,8 +81,9 @@ class Window(QWidget, QtCore.QAbstractTableModel):
         """ update ticket """
         refresh_btn = QPushButton("Update Ticket")
         def update_ticket():
-            print(ticket_system.tickets(self.curr_tickets))
-
+            #from ticket import Ui_ticket_system
+            import ticket
+            #print(Ui_ticket_system.tickets(self.curr_tickets))
         refresh_btn.clicked.connect(update_ticket)
         layout.addWidget(refresh_btn)
 
@@ -84,7 +91,9 @@ class Window(QWidget, QtCore.QAbstractTableModel):
         delete_btn = QPushButton("Delete Ticket")
 
         def delete_ticket():
-            print(ticket_system.tickets(self.curr_tickets))
+            #from ticket import Ui_ticket_system
+            import ticket
+            #print(Ui_ticket_system.tickets(self.curr_tickets))
 
         delete_btn.clicked.connect(delete_ticket)
         layout.addWidget(delete_btn)
@@ -98,7 +107,7 @@ class Window(QWidget, QtCore.QAbstractTableModel):
         """Display UI"""
         self.show()
         self.setLayout(layout)
-#        print(self.children())
+#       print(self.children())
 
 
 if __name__ == "__main__":
