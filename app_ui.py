@@ -21,7 +21,8 @@ class Window(QWidget, QtCore.QAbstractTableModel):
     def __init__(self):
         super(Window, self).__init__()
         # Background image location
-        oImage = QImage("E:\School\CEN4031.Adv Program Development Framework\TitanHelpApplication\images\\ticket system.png")
+        app_path = os.path.abspath(os.path.dirname(__file__))
+        oImage = QImage(os.path.join(app_path,'images\\ticket system.png'))
         """ Background Image Sizing | Dimensions Height , Width """
         sImage = oImage.scaled(QSize(800, 600))  # resize Image to widgets size 450, 800
         palette = QPalette()
@@ -39,7 +40,9 @@ class Window(QWidget, QtCore.QAbstractTableModel):
         # Set up GUI Details
         self.setWindowTitle("Titan Help Application")
         self.setPalette(palette)
-        self.setWindowIcon(QIcon("E:\School\CEN4031.Adv Program Development Framework\TitanHelpApplication\images\\atlas.png"))
+        app_path = os.path.abspath(os.path.dirname(__file__))
+        icon_file = QIcon(os.path.join(app_path,'images\\atlas.png'))
+        self.setWindowIcon(icon_file)
 
         """Create the General page UI."""
         generalTab = QWidget()
