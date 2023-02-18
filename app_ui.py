@@ -10,8 +10,12 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QWidget, QPushButton )
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSql
 from PyQt5.QtCore import Qt
+
+import requests
+import backend
+
 #from ticket import Ui_ticket_system
-import db_test
+#import db_test
 
 """
 Main Application User Interface
@@ -94,9 +98,10 @@ class Window(QWidget, QtCore.QAbstractTableModel):
         delete_btn = QPushButton("Delete Ticket")
 
         def delete_ticket():
-            #from ticket import Ui_ticket_system
-            import ticket
-            #print(Ui_ticket_system.tickets(self.curr_tickets))
+            url = "http://127.0.0.1/tickets/<id>"
+            requests.delete(url)
+
+            print('delete ticket started')
 
         delete_btn.clicked.connect(delete_ticket)
         layout.addWidget(delete_btn)

@@ -10,6 +10,8 @@ flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
 pyqt5 = "*"
 self = "*"
+sqlalchemy = "*"
+marshmallow = "*"
 
 [dev-packages]
 
