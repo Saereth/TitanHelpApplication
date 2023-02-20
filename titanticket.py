@@ -1,11 +1,77 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QTableWidgetItem
 from manage_ticket import Ui_TicketWindow
+import requests
+from backend import app
+import json
+
+ENDPOINT = "http://127.0.0.1:5000"
+TICKETLIST = ENDPOINT + "/tickets/"
+TICKETURL = ENDPOINT + "/ticket"
 
 class Ui_MainWindow(object):
 
+    #Initialize the class with a default constructor
     def __init__(self):
         super().__init__()
+        self.current_ticket_list = []
         self.ticket_manager = None  # No external window yet.
+
+    #populate the tableview 
+    def populate_ticket_list(self,page=1):
+        #disable sorting during population, re-eneable after
+        self.tableWidget.setSortingEnabled(False)
+        self.tableWidget.clear()
+
+        # default to page 1 view if no page is passed - this asks our API to return 20 results starting 
+        # at the specified page or starting at the begining if no page is specified
+
+        url = TICKETLIST + str(page)
+        print("populate_ticket_list - URL = " + url)
+        response = requests.get(url)
+        
+
+        #self.current_ticket_list
+        jsonResponse = response.json()
+
+        ''' TODO: Add handlers for exceptions/errors. pop up a message box with the error. 
+        except HTTPError as http_err:
+        print(f'HTTP error occurred: {http_err}')
+        except Exception as err:
+        print(f'Other error occurred: {err}')
+        '''
+        tl = self.current_ticket_list
+        tl.clear()
+        ticket_table = self.tableWidget
+
+        for row, item in enumerate(jsonResponse):
+            ticket_table.setItem(row, 0, QTableWidgetItem(str(item['id'])))
+            ticket_table.setItem(row, 1, QTableWidgetItem(item['name']))
+            ticket_table.setItem(row, 2, QTableWidgetItem(item['date']))
+            ticket_table.setItem(row, 3, QTableWidgetItem(item['description']))
+
+        #re-enable sorting after the data has been added to the table, this prevents recursive sorting issue during data load
+        self.tableWidget.setSortingEnabled(True)
+        
+    def delete_ticket(self):
+        row = self.tableWidget.currentRow()
+        id = self.tableWidget.item(row,0).text()
+        print("Selected ID is:" + id, " Row is: " + str(row))
+
+        #TODO: Put in a check to make sure a valid row is selected before passing the id off to the api response
+        url = TICKETURL + "/" + id
+        print("delete_ticket - URL = " + url)
+        response = requests.delete(url)
+
+        #get current page number
+        if self.current_page.text() == "":
+            self.current_page.setText("1")
+            print("set page to 1")
+
+        #Update ticket list view after delete
+        print("Current page: " + self.current_page.text())
+        self.populate_ticket_list(self.current_page.text())
+
 
     def update_ticket_window(self,id=None):
         if self.ticket_manager is None:
@@ -220,6 +286,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName("label_2")
         self.tableWidget = QtWidgets.QTableWidget(self.main_frame)
         self.tableWidget.setGeometry(QtCore.QRect(10, 170, 591, 271))
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -268,7 +335,7 @@ class Ui_MainWindow(object):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.NoRole, brush)
         self.tableWidget.setPalette(palette)
         font = QtGui.QFont()
-        font.setFamily("Modern No. 20")
+        font.setFamily("Calibri")
         font.setPointSize(14)
         self.tableWidget.setFont(font)
         self.tableWidget.setAutoFillBackground(False)
@@ -357,6 +424,7 @@ class Ui_MainWindow(object):
         self.button_delete_ticket = QtWidgets.QPushButton(self.main_frame)
         self.button_delete_ticket.setGeometry(QtCore.QRect(620, 260, 91, 31))
         self.button_delete_ticket.setObjectName("button_delete_ticket")
+        self.button_delete_ticket.clicked.connect(lambda: self.delete_ticket())
         self.button_update_ticket = QtWidgets.QPushButton(self.main_frame)
         self.button_update_ticket.setGeometry(QtCore.QRect(620, 220, 91, 31))
         self.button_update_ticket.setObjectName("button_update_ticket")
@@ -405,5 +473,6 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    ui.populate_ticket_list()
     MainWindow.show()
     sys.exit(app.exec_())
