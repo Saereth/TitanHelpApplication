@@ -37,8 +37,8 @@ class Ui_MainWindow(object):
             page = 1
             self.current_page.setText("1")
 
-        if int(page) >= math.trunc(self.total_tickets/20):
-            page = math.trunc(self.total_tickets/20)
+        if int(page) > math.trunc(self.total_tickets/20)+1:
+            page = math.trunc(self.total_tickets/20)+1
 
         #disable sorting during population, re-eneable after
         self.tableWidget.setSortingEnabled(False)
@@ -491,7 +491,7 @@ class Ui_MainWindow(object):
         self.button_next.setText(_translate("MainWindow", ">>"))
 
         #increment current page but dissallow entering a page number beyond max
-        self.button_next.clicked.connect(lambda: self.current_page.setText(str(min(int(self.current_page.text())+1,math.trunc(self.total_tickets/20)))))
+        self.button_next.clicked.connect(lambda: self.current_page.setText(str(min(int(self.current_page.text())+1,1+math.trunc(self.total_tickets/20)))))
         self.current_page.setText("1") 
         self.current_page.textChanged.connect(lambda: self.populate_ticket_list(self.current_page.text()))
         self.button_create_ticket.setText(_translate("MainWindow", "Create"))
