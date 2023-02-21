@@ -15,7 +15,10 @@ class Ui_MainWindow(object):
     def __init__(self):
         super().__init__()
         self.current_ticket_list = []
-        self.ticket_manager = None  # No external window yet.
+        self.ticket_manager = QtWidgets.QMainWindow()
+        self.ticket_manager_ui = Ui_TicketWindow(self.ticket_manager)
+        self.ticket_manager_ui.setupUi(self.ticket_manager)
+        self.ticket_manager.hide()
 
     #populate the tableview 
     def populate_ticket_list(self,page=1):
@@ -72,16 +75,14 @@ class Ui_MainWindow(object):
         print("Current page: " + self.current_page.text())
         self.populate_ticket_list(self.current_page.text())
 
-
-    def update_ticket_window(self,id=None):
-        if self.ticket_manager is None:
-            self.ticket_manager = QtWidgets.QMainWindow()
-            self.ticket_manager_ui = Ui_TicketWindow(self.ticket_manager)
-            self.ticket_manager_ui.setupUi(self.ticket_manager)
-            self.ticket_manager.show()
+    def refresh_ticket_window(self,hide=False):
+        if self.current_page.text() == "":
+            self.current_page.setText("1")
+        self.populate_ticket_list(self.current_page.text())
+        if hide:
+            self.ticket_manager.hide()
         else:
             self.ticket_manager.show()
-
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -418,7 +419,8 @@ class Ui_MainWindow(object):
         self.current_page.setAlignment(QtCore.Qt.AlignCenter)
         self.current_page.setObjectName("current_page")
         self.button_create_ticket = QtWidgets.QPushButton(self.main_frame)
-        self.button_create_ticket.clicked.connect(lambda: self.update_ticket_window())
+        self.button_create_ticket.clicked.connect(lambda: self.refresh_ticket_window())
+        self.ticket_manager_ui.button_confirm_update.clicked.connect(lambda: self.refresh_ticket_window(True))
         self.button_create_ticket.setGeometry(QtCore.QRect(620, 180, 91, 31))
         self.button_create_ticket.setObjectName("button_create_ticket")
         self.button_delete_ticket = QtWidgets.QPushButton(self.main_frame)

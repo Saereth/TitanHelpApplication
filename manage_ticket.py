@@ -1,5 +1,4 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-import backend
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
@@ -26,7 +25,7 @@ class Ui_TicketWindow(object):
 
     def __init__(self,parent):
         super().__init__()
-        self.parent = parent  #define parent object
+        self.parent = parent
 
     def setupUi(self, TicketWindow):
         TicketWindow.setObjectName("TicketWindow")
@@ -302,14 +301,14 @@ class Ui_TicketWindow(object):
         self.button_confirm_update.setText(_translate("TicketWindow", "Confirm"))
         self.button_cancel.setText(_translate("TicketWindow", "Cancel"))
     def create_new_ticket(self):
-        response = requests
 
         new_ticket = {
             "name": f'{self.ticket_name.displayText()}',
             "description": f'{self.ticket_description.toPlainText()}',
             "date": f'{self.ticket_date.displayText()}'
                         }
-        return response.post(url, json=new_ticket)
+        response = requests.post(url, json=new_ticket)
+        return response
 
         #print(f'{self.ticket_name.text()}', " ", f'{self.ticket_date.text()}', " ", f"{self.ticket_description.text()}")
 
