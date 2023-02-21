@@ -24,6 +24,7 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 #create a JsonTicket class for SQL Alchemy to use
+
 #Todo Move logic to JSonTicket.py
 
 class JSONTicket(db.Model):
@@ -67,6 +68,12 @@ def get_tickets_pageless():
     ticket_list = JSONTicket.query.paginate(page=1,per_page=20)
     result = jsontickets_schema.dump(ticket_list)
     return jsonify(result)
+
+# Get Tickets count
+@app.route('/ticket_count', methods=['GET'])
+def get_ticket_count():
+    ticket_count = JSONTicket.query.count()
+    return str(ticket_count)
 
 # Get Tickets with pagenumber
 @app.route('/tickets/<page_num>', methods=['GET'])
