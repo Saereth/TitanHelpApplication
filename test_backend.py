@@ -21,6 +21,12 @@ class TestBackend(unittest.TestCase):
         self.assertEqual(response.content_type,"application/json")
         print("Datatype test completed with response: " + str(response))
 
+    '''
+    def test_mass_create(self):
+        for x in range (1,200):
+            payload = create_numbered_payload(x)
+            create_ticket(payload,self)
+    '''
     #Check ticket creation endpoint
     def test_create(self):
         payload = create_payload()
@@ -84,6 +90,15 @@ def delete_ticket(ticket_id,obj):
     tester = app.test_client(obj)
     return tester.delete('/ticket/' + f"{ticket_id}")
     pass
+
+def create_numbered_payload(num):
+        payload = {
+            "name": f'AutoGenEntry{num}',
+            "description": f'AutoGenEntry{num} Description',
+            "date": "2023-01-01"
+        }
+        return payload
+
 
 def create_payload():
         payload = {
