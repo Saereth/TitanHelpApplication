@@ -95,6 +95,13 @@ class Ui_MainWindow(object):
         #Update ticket list view after delete
         print("Current page: " + self.current_page.text())
         self.populate_ticket_list(self.current_page.text())
+    
+    def close_windows(self):
+        self.ticket_manager.hide()
+        MainWindow.close()
+        #self.MainWindow.close()
+        #lambda:QtCore.QCoreApplication.instance().quit()
+            #self.ticket_manager.close()
 
     def refresh_ticket_window(self,hide=False):
         #update total ticket count
@@ -457,7 +464,7 @@ class Ui_MainWindow(object):
         self.button_exit = QtWidgets.QPushButton(self.main_frame)
         self.button_exit.setGeometry(QtCore.QRect(620, 400, 91, 31))
         self.button_exit.setObjectName("button_exit")
-        self.button_exit.clicked.connect(lambda:QtCore.QCoreApplication.instance().quit())
+        self.button_exit.clicked.connect(self.close_windows)#lambda:QtCore.QCoreApplication.instance().quit())
         self.logo_frame = QtWidgets.QFrame(self.main_frame)
         self.logo_frame.setGeometry(QtCore.QRect(0, 0, 431, 101))
         self.logo_frame.setFrameShape(QtWidgets.QFrame.Box)
