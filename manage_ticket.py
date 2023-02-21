@@ -303,13 +303,15 @@ class Ui_TicketWindow(object):
         self.button_cancel.setText(_translate("TicketWindow", "Cancel"))
     def create_new_ticket(self):
         response = requests
+
         new_ticket = {
-            "name": f'{self.ticket_name.text()}',
-            "description": f'{self.ticket_description.text()}',
-            "date": f'{self.ticket_date.text()}'
+            "name": f'{self.ticket_name.displayText()}',
+            "description": f'{self.ticket_description.toPlainText()}',
+            "date": f'{self.ticket_date.displayText()}'
                         }
         return response.post(url, json=new_ticket)
 
+        #print(f'{self.ticket_name.text()}', " ", f'{self.ticket_date.text()}', " ", f"{self.ticket_description.text()}")
 
 if __name__ == "__main__":
     import sys
