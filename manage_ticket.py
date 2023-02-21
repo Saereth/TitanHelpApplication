@@ -263,7 +263,6 @@ class Ui_TicketWindow(object):
         self.ticket_name = QtWidgets.QLineEdit(self.frame)
         self.ticket_name.setGeometry(QtCore.QRect(10, 40, 171, 21))
         self.ticket_name.setObjectName("ticket_name")
-
         """ Ticket Date """
         self.ticket_date = QtWidgets.QLineEdit(self.frame)
         self.ticket_date.setGeometry(QtCore.QRect(10, 80, 71, 21))
@@ -305,9 +304,9 @@ class Ui_TicketWindow(object):
     def create_new_ticket(self):
         response = requests
         new_ticket = {
-            "name": "Test7",
-            "description": "This is Test7 Ticket",
-            "date": "2023-02-14"
+            "name": f'{self.ticket_name.text()}',
+            "description": f'{self.ticket_description.text()}',
+            "date": f'{self.ticket_date.text()}'
                         }
         return response.post(url, json=new_ticket)
 
