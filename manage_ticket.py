@@ -1,4 +1,26 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+import backend
+from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+from marshmallow import Schema, fields
+
+#Os import for handling file paths
+import os
+import requests
+
+# Initialize the application
+app = Flask(__name__)
+dbpath = os.path.abspath(os.path.dirname(__file__))
+
+# shutup console
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# db
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(dbpath, 'titanhelp.db')
+
+url = "http://localhost:5000/ticket"
+db = SQLAlchemy(app)
 
 class Ui_TicketWindow(object):
 
@@ -224,6 +246,7 @@ class Ui_TicketWindow(object):
         brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
+        """ Ticket ID """
         self.ticket_id.setPalette(palette)
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -234,23 +257,33 @@ class Ui_TicketWindow(object):
         self.ticket_id.setText("")
         self.ticket_id.setTextFormat(QtCore.Qt.PlainText)
         self.ticket_id.setAlignment(QtCore.Qt.AlignCenter)
-        self.ticket_id.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
+        self.ticket_id.setTextInteractionFlags(QtCore.Qt.NoTextInteraction) # set to allow input
         self.ticket_id.setObjectName("ticket_id")
+        """ Ticket Name """
         self.ticket_name = QtWidgets.QLineEdit(self.frame)
         self.ticket_name.setGeometry(QtCore.QRect(10, 40, 171, 21))
         self.ticket_name.setObjectName("ticket_name")
+
+        """ Ticket Date """
         self.ticket_date = QtWidgets.QLineEdit(self.frame)
         self.ticket_date.setGeometry(QtCore.QRect(10, 80, 71, 21))
         self.ticket_date.setText("")
         self.ticket_date.setMaxLength(10)
         self.ticket_date.setObjectName("ticket_date")
+        """ Ticket Description """
         self.ticket_description = QtWidgets.QPlainTextEdit(self.frame)
         self.ticket_description.setGeometry(QtCore.QRect(10, 120, 441, 131))
         self.ticket_description.setPlainText("")
         self.ticket_description.setObjectName("ticket_description")
+
+        """ Confirm Ticket Button """
         self.button_confirm_update = QtWidgets.QPushButton(self.centralwidget)
         self.button_confirm_update.setGeometry(QtCore.QRect(420, 300, 75, 23))
         self.button_confirm_update.setObjectName("button_confirm_update")
+        # define function to insert new information into titanticket.py QTableWidget
+        self.button_confirm_update.clicked.connect(lambda:self.create_new_ticket())
+
+        """ Cancel Ticket Button """
         self.button_cancel = QtWidgets.QPushButton(self.centralwidget)
         self.button_cancel.setGeometry(QtCore.QRect(510, 300, 75, 23))
         self.button_cancel.clicked.connect(lambda:self.parent.hide())
@@ -269,13 +302,21 @@ class Ui_TicketWindow(object):
         self.label_name_4.setText(_translate("TicketWindow", "Description"))
         self.button_confirm_update.setText(_translate("TicketWindow", "Confirm"))
         self.button_cancel.setText(_translate("TicketWindow", "Cancel"))
+    def create_new_ticket(self):
+        response = requests
+        new_ticket = {
+            "name": "Test7",
+            "description": "This is Test7 Ticket",
+            "date": "2023-02-14"
+                        }
+        return response.post(url, json=new_ticket)
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     TicketWindow = QtWidgets.QMainWindow()
-    ui = Ui_TicketWindow()
+    ui = Ui_TicketWindow(object)
     ui.setupUi(TicketWindow)
     TicketWindow.show()
     sys.exit(app.exec_())
