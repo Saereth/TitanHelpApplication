@@ -3,25 +3,43 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from manage_ticket import Ui_TicketWindow
 import requests
 from backend import app
-import json
+import math
 
 ENDPOINT = "http://127.0.0.1:5000"
 TICKETLIST = ENDPOINT + "/tickets/"
 TICKETURL = ENDPOINT + "/ticket"
+COUNTURL = ENDPOINT + "/ticket_count"
 
 class Ui_MainWindow(object):
 
     #Initialize the class with a default constructor
     def __init__(self):
         super().__init__()
+
+        #setup Ticket manager
+        self.total_tickets = self.get_total_tickets()
         self.current_ticket_list = []
         self.ticket_manager = QtWidgets.QMainWindow()
         self.ticket_manager_ui = Ui_TicketWindow(self.ticket_manager)
         self.ticket_manager_ui.setupUi(self.ticket_manager)
         self.ticket_manager.hide()
 
+    #this checks how many total tickets we have and saves it to the total_tickets variable for pagination maximums in the navigation controls
+    def get_total_tickets(self):
+        url = COUNTURL
+        response = requests.get(url)
+
+        return int(response.json())
+
     #populate the tableview 
     def populate_ticket_list(self,page=1):
+        if page == "" or page == None:
+            page = 1
+            self.current_page.setText("1")
+
+        if int(page) >= math.trunc(self.total_tickets/20):
+            page = math.trunc(self.total_tickets/20)
+
         #disable sorting during population, re-eneable after
         self.tableWidget.setSortingEnabled(False)
         self.tableWidget.clear()
@@ -71,11 +89,17 @@ class Ui_MainWindow(object):
             self.current_page.setText("1")
             print("set page to 1")
 
+        #update total ticket count
+        self.total_tickets = self.get_total_tickets()
+        
         #Update ticket list view after delete
         print("Current page: " + self.current_page.text())
         self.populate_ticket_list(self.current_page.text())
 
     def refresh_ticket_window(self,hide=False):
+        #update total ticket count
+        self.total_tickets = self.get_total_tickets()
+
         if self.current_page.text() == "":
             self.current_page.setText("1")
         self.populate_ticket_list(self.current_page.text())
@@ -461,8 +485,15 @@ class Ui_MainWindow(object):
         self.tableWidget.setSortingEnabled(False)
         self.tableWidget.setSortingEnabled(__sortingEnabled)
         self.button_previous.setText(_translate("MainWindow", "<<"))
+
+        #decrement current page but idssallow enter a page numer lower than max
+        self.button_previous.clicked.connect(lambda: self.current_page.setText(str(max(int(self.current_page.text())-1,1))))
         self.button_next.setText(_translate("MainWindow", ">>"))
-        self.current_page.setPlaceholderText(_translate("MainWindow", "1"))
+
+        #increment current page but dissallow entering a page number beyond max
+        self.button_next.clicked.connect(lambda: self.current_page.setText(str(min(int(self.current_page.text())+1,math.trunc(self.total_tickets/20)))))
+        self.current_page.setText("1") 
+        self.current_page.textChanged.connect(lambda: self.populate_ticket_list(self.current_page.text()))
         self.button_create_ticket.setText(_translate("MainWindow", "Create"))
         self.button_delete_ticket.setText(_translate("MainWindow", "Delete"))
         self.button_update_ticket.setText(_translate("MainWindow", "Update"))
