@@ -300,8 +300,8 @@ class Ui_TicketWindow(object):
         self.label_name_4.setText(_translate("TicketWindow", "Description"))
         self.button_confirm_update.setText(_translate("TicketWindow", "Confirm"))
         self.button_cancel.setText(_translate("TicketWindow", "Cancel"))
+    
     def create_new_ticket(self):
-
         new_ticket = {
             "name": f'{self.ticket_name.displayText()}',
             "description": f'{self.ticket_description.toPlainText()}',
@@ -310,7 +310,18 @@ class Ui_TicketWindow(object):
         response = requests.post(url, json=new_ticket)
         return response
 
-        #print(f'{self.ticket_name.text()}', " ", f'{self.ticket_date.text()}', " ", f"{self.ticket_description.text()}")
+    def update_ticket(self):
+        """
+        1) make sure a row is selected
+        2) grab the ticket id from the row
+        3) pass the ticket url with the id to the api to get the json of that ticket back and use that to populate the ticket_manager fields
+        4) confirm button sends the requests.put() method back to the api to update the db
+        5) refresh the navigation table
+        """
+        
+        
+
+
 
 if __name__ == "__main__":
     import sys
