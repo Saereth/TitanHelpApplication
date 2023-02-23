@@ -5,6 +5,7 @@ from manage_ticket import Ui_TicketWindow
 import requests
 from backend import app
 import math
+import json
 
 ENDPOINT = "http://127.0.0.1:5000"
 TICKETLIST = ENDPOINT + "/tickets/"
@@ -28,27 +29,30 @@ class Ui_MainWindow(object):
     def update_ticket(self):
         row = self.tableWidget.currentRow()
         id = self.tableWidget.item(row,0).text()
+        url = TICKETURL + "/" + str(id)
         ticket_table = self.tableWidget
         #for row,item in enumerate(jsonResponse):
-        name = request().json['name']
-        description = request.json['description']
-        date = request.json['date']
+        response = requests.get(url).json()
+        print("Response: " + json.dumps(response))
+        name = response['name']
+        description = response['description']
+        date = response['date']
         print("Selected ID is:" + id, " Row is: " + str(row), "name is: " + name)
         #TODO: Put in a check to make sure a valid row is selected before passing the id off to the api response
         #ticket = { "name": f'{}'}
-        url = TICKETURL + "/" + id
+
         self.ticket_manager.show()
-        #response = requests.get(url)
+        #TODO set field values in ticket_manager with the values now saverd in name/description/date/id
+        
         """
             row, 0, QTableWidgetItem(str(item['id'])))
             ticket_table.setItem(row, 1, QTableWidgetItem(item['name']))
             ticket_table.setItem(row, 2, QTableWidgetItem(item['date']))
             ticket_table.setItem(row, 3, QTableWidgetItem(item['description']
         """
-        #Update ticket list view after update
+        #Update ticket list view after update - This doesnt need to be called until the update happens
         print("Current page: " + self.current_page.text())
         self.populate_ticket_list(self.current_page.text())
-        response  = request.get(url)
 
         
 
