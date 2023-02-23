@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem
+from flask import Flask, request, jsonify
 from manage_ticket import Ui_TicketWindow
 import requests
 from backend import app
@@ -23,6 +24,33 @@ class Ui_MainWindow(object):
         self.ticket_manager_ui = Ui_TicketWindow(self.ticket_manager)
         self.ticket_manager_ui.setupUi(self.ticket_manager)
         self.ticket_manager.hide()
+
+    def update_ticket(self):
+        row = self.tableWidget.currentRow()
+        id = self.tableWidget.item(row,0).text()
+        ticket_table = self.tableWidget
+        #for row,item in enumerate(jsonResponse):
+        name = request().json['name']
+        description = request.json['description']
+        date = request.json['date']
+        print("Selected ID is:" + id, " Row is: " + str(row), "name is: " + name)
+        #TODO: Put in a check to make sure a valid row is selected before passing the id off to the api response
+        #ticket = { "name": f'{}'}
+        url = TICKETURL + "/" + id
+        self.ticket_manager.show()
+        #response = requests.get(url)
+        """
+            row, 0, QTableWidgetItem(str(item['id'])))
+            ticket_table.setItem(row, 1, QTableWidgetItem(item['name']))
+            ticket_table.setItem(row, 2, QTableWidgetItem(item['date']))
+            ticket_table.setItem(row, 3, QTableWidgetItem(item['description']
+        """
+        #Update ticket list view after update
+        print("Current page: " + self.current_page.text())
+        self.populate_ticket_list(self.current_page.text())
+        response  = request.get(url)
+
+        
 
     #this checks how many total tickets we have and saves it to the total_tickets variable for pagination maximums in the navigation controls
     def get_total_tickets(self):
@@ -95,6 +123,10 @@ class Ui_MainWindow(object):
         #Update ticket list view after delete
         print("Current page: " + self.current_page.text())
         self.populate_ticket_list(self.current_page.text())
+    
+    def close_windows(self):
+        self.ticket_manager.hide()
+        MainWindow.close()
 
     def refresh_ticket_window(self,hide=False):
         #update total ticket count
@@ -454,10 +486,11 @@ class Ui_MainWindow(object):
         self.button_update_ticket = QtWidgets.QPushButton(self.main_frame)
         self.button_update_ticket.setGeometry(QtCore.QRect(620, 220, 91, 31))
         self.button_update_ticket.setObjectName("button_update_ticket")
+        self.button_update_ticket.clicked.connect(self.update_ticket)
         self.button_exit = QtWidgets.QPushButton(self.main_frame)
         self.button_exit.setGeometry(QtCore.QRect(620, 400, 91, 31))
         self.button_exit.setObjectName("button_exit")
-        self.button_exit.clicked.connect(lambda:QtCore.QCoreApplication.instance().quit())
+        self.button_exit.clicked.connect(self.close_windows)#lambda:QtCore.QCoreApplication.instance().quit())
         self.logo_frame = QtWidgets.QFrame(self.main_frame)
         self.logo_frame.setGeometry(QtCore.QRect(0, 0, 431, 101))
         self.logo_frame.setFrameShape(QtWidgets.QFrame.Box)
@@ -496,7 +529,7 @@ class Ui_MainWindow(object):
         self.current_page.textChanged.connect(lambda: self.populate_ticket_list(self.current_page.text()))
         self.button_create_ticket.setText(_translate("MainWindow", "Create"))
         self.button_delete_ticket.setText(_translate("MainWindow", "Delete"))
-        self.button_update_ticket.setText(_translate("MainWindow", "Update"))
+        self.button_update_ticket.setText(_translate("MainWindow", "Edit"))
         self.button_exit.setText(_translate("MainWindow", "Exit"))
 
 
