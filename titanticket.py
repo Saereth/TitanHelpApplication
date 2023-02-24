@@ -39,20 +39,18 @@ class Ui_MainWindow(object):
         date = response['date']
         print("Selected ID is:" + id, " Row is: " + str(row), "name is: " + name)
         #TODO: Put in a check to make sure a valid row is selected before passing the id off to the api response
-        #ticket = { "name": f'{}'}
-
+        
         self.ticket_manager.show()
         #TODO set field values in ticket_manager with the values now saverd in name/description/date/id
-        
-        """
-            row, 0, QTableWidgetItem(str(item['id'])))
-            ticket_table.setItem(row, 1, QTableWidgetItem(item['name']))
-            ticket_table.setItem(row, 2, QTableWidgetItem(item['date']))
-            ticket_table.setItem(row, 3, QTableWidgetItem(item['description']
-        """
+        self.ticket_manager_ui.ticket_id.setText(id)
+        self.ticket_manager_ui.ticket_name.setText(name)
+        self.ticket_manager_ui.ticket_date.setText(date)
+        self.ticket_manager_ui.ticket_description.insertPlainText(description)
+        #self.update_ticket
         #Update ticket list view after update - This doesnt need to be called until the update happens
         print("Current page: " + self.current_page.text())
         self.populate_ticket_list(self.current_page.text())
+
 
         
 
