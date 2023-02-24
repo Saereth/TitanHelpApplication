@@ -26,12 +26,11 @@ class Ui_MainWindow(object):
         self.ticket_manager_ui.setupUi(self.ticket_manager)
         self.ticket_manager.hide()
 
-    def update_ticket(self):
+    def edit_ticket(self):
         row = self.tableWidget.currentRow()
         id = self.tableWidget.item(row,0).text()
         url = TICKETURL + "/" + str(id)
-        ticket_table = self.tableWidget
-        #for row,item in enumerate(jsonResponse):
+
         response = requests.get(url).json()
         print("Response: " + json.dumps(response))
         name = response['name']
@@ -46,13 +45,7 @@ class Ui_MainWindow(object):
         self.ticket_manager_ui.ticket_name.setText(name)
         self.ticket_manager_ui.ticket_date.setText(date)
         self.ticket_manager_ui.ticket_description.insertPlainText(description)
-        #self.update_ticket
-        #Update ticket list view after update - This doesnt need to be called until the update happens
-        print("Current page: " + self.current_page.text())
-        self.populate_ticket_list(self.current_page.text())
-
-
-        
+     
 
     #this checks how many total tickets we have and saves it to the total_tickets variable for pagination maximums in the navigation controls
     def get_total_tickets(self):
@@ -129,6 +122,20 @@ class Ui_MainWindow(object):
     def close_windows(self):
         self.ticket_manager.hide()
         MainWindow.close()
+
+    def update_ticket(self):
+        id = self.ticket_manager_ui.ticket_id.text()
+        name = self.ticket_manager_ui.ticket_name.displayText()
+        description = self.ticket_manager_ui.ticket_description.toPlainText()
+        date = self.ticket_manager_ui.ticket_date.displayText()
+        url = TICKETURL + "/" + str(id)
+        ticket_update = {
+            "name": f'{name}',
+            "description": f'{description}',
+            "date": f'{date}'
+                        }
+        requests.put(url, json=ticket_update)
+        self.refresh_ticket_window(True)
 
     def refresh_ticket_window(self,hide=False):
         #update total ticket count
@@ -478,7 +485,7 @@ class Ui_MainWindow(object):
         self.current_page.setObjectName("current_page")
         self.button_create_ticket = QtWidgets.QPushButton(self.main_frame)
         self.button_create_ticket.clicked.connect(lambda: self.refresh_ticket_window())
-        self.ticket_manager_ui.button_confirm_update.clicked.connect(lambda: self.refresh_ticket_window(True))
+        self.ticket_manager_ui.button_confirm_update.clicked.connect(lambda: self.update_ticket())
         self.button_create_ticket.setGeometry(QtCore.QRect(620, 180, 91, 31))
         self.button_create_ticket.setObjectName("button_create_ticket")
         self.button_delete_ticket = QtWidgets.QPushButton(self.main_frame)
@@ -488,7 +495,7 @@ class Ui_MainWindow(object):
         self.button_update_ticket = QtWidgets.QPushButton(self.main_frame)
         self.button_update_ticket.setGeometry(QtCore.QRect(620, 220, 91, 31))
         self.button_update_ticket.setObjectName("button_update_ticket")
-        self.button_update_ticket.clicked.connect(self.update_ticket)
+        self.button_update_ticket.clicked.connect(lambda: self.edit_ticket())
         self.button_exit = QtWidgets.QPushButton(self.main_frame)
         self.button_exit.setGeometry(QtCore.QRect(620, 400, 91, 31))
         self.button_exit.setObjectName("button_exit")
