@@ -310,7 +310,7 @@ class Ui_TicketWindow(object):
         response = requests.post(url, json=new_ticket)
         return response
 
-    def update_ticket(self):
+    def update_ticket(self):#
         """
         1) make sure a row is selected
         2) grab the ticket id from the row
