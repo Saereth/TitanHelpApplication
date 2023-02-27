@@ -12,7 +12,7 @@ TICKETLIST = ENDPOINT + "/tickets/"
 TICKETURL = ENDPOINT + "/ticket"
 COUNTURL = ENDPOINT + "/ticket_count"
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(object):#
 
     #Initialize the class with a default constructor
     def __init__(self):
