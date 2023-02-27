@@ -3,7 +3,9 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow import Schema, fields
-
+import json
+import jsonschema
+from jsonschema import validate
 #Os import for handling file paths
 import os
 import requests
@@ -20,7 +22,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(dbpath, 'tit
 
 url = "http://localhost:5000/ticket"
 db = SQLAlchemy(app)
-
+ticketSchema = {
+    'type': 'object',
+    'properties': {
+    'id': {'type': 'number'},
+    'name':{'type': 'string', 'minLength':1, 'maxLength':25},
+    'date': {'type': 'number'},
+    'description':{'type': 'string', 'minLength':1, 'maxLength':25}
+    }
+}
 class Ui_TicketWindow(object):
 
     def __init__(self,parent):
@@ -279,7 +289,7 @@ class Ui_TicketWindow(object):
         self.button_confirm_update.setGeometry(QtCore.QRect(420, 300, 75, 23))
         self.button_confirm_update.setObjectName("button_confirm_update")
         # define function to insert new information into titanticket.py QTableWidget
-        self.button_confirm_update.clicked.connect(lambda:self.create_new_ticket())
+        self.button_confirm_update.clicked.connect(lambda:self.confirm_choice)
 
         """ Cancel Ticket Button """
         self.button_cancel = QtWidgets.QPushButton(self.centralwidget)
@@ -308,18 +318,50 @@ class Ui_TicketWindow(object):
             "date": f'{self.ticket_date.displayText()}'
                         }
         response = requests.post(url, json=new_ticket)
+        
         return response
 
-    def update_ticket(self):#
-        """
-        1) make sure a row is selected
-        2) grab the ticket id from the row
-        3) pass the ticket url with the id to the api to get the json of that ticket back and use that to populate the ticket_manager fields
-        4) confirm button sends the requests.put() method back to the api to update the db
-        5) refresh the navigation table
-        """
-        
-        
+    def update_ticket(self):
+        pass
+
+    def confirm_choice(self, type="Insert"):
+        import titanticket
+        titan = titanticket.Ui_TicketWindow.setupUi
+        if type == "Insert":
+            self.create_new_ticket
+        else:
+            id = self.ticket_manager_ui.ticket_id.text()
+            name = self.ticket_manager_ui.ticket_name.text()
+            description = self.ticket_description.toPlainText()
+            date = self.ticket_manager_ui.ticket_date.displayText()
+            url = TICKETURL + "/" + str(id)
+            ticket_update = {
+                "name": f'{name}',
+                "description": f'{description}',
+                "date": f'{date}'
+                        }
+            self.validateJson(ticket_update)
+            self.check_validity(ticket_update)
+            requests.put(url, json=ticket_update)
+            self.refresh_ticket_window(True)
+            
+    def validateJson(jsonData):
+
+        try:
+            validate(instance=jsonData, schema=ticketSchema)
+            print('validated')
+        except jsonschema.exceptions.ValidationError as err:
+            return False
+        return True
+    
+    def check_validity(jsonData):
+        isValid = validateJson(jsonData)
+        if isValid:
+            print(jsonData)
+            print('Provided JSON data is Valid')
+        else:
+            print(jsonData)
+            print('Given JSON data is invalid')
 
 
 
