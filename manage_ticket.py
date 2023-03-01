@@ -27,7 +27,7 @@ ticketSchema = {
     'properties': {
     'id': {'type': 'number'},
     'name':{'type': 'string', 'minLength':1, 'maxLength':25},
-    'date': {'type': 'number'},
+    'date': {'type': 'number', 'minLength':8, 'maxLength': 8},
     'description':{'type': 'string', 'minLength':1, 'maxLength':25}
     }
 }
@@ -340,8 +340,9 @@ class Ui_TicketWindow(object):
                 "description": f'{description}',
                 "date": f'{date}'
                         }
+            validate(instance={id, name, description, date}, schema=ticketSchema)
             self.validateJson(ticket_update)
-            self.check_validity(ticket_update)
+            self.check_validity(ticketSchema)
             requests.put(url, json=ticket_update)
             self.refresh_ticket_window(True)
             
