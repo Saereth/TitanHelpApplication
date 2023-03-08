@@ -21,6 +21,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(dbpath, 'titanhelp.db')
 
 url = "http://localhost:5000/ticket"
+
+ENDPOINT = "http://127.0.0.1:5000"
+TICKETLIST = ENDPOINT + "/tickets/"
+TICKETURL = ENDPOINT + "/ticket"
+COUNTURL = ENDPOINT + "/ticket_count"
+
 db = SQLAlchemy(app)
 ticketSchema = {
     'type': 'object',
@@ -325,11 +331,10 @@ class Ui_TicketWindow(object):
         pass
 
     def confirm_choice(self, type="Insert"):
-        import titanticket
-        titan = titanticket.Ui_TicketWindow.setupUi
+        #import titanticket
+        #titan = titanticket.Ui_TicketWindow.setupUi
         if type == "Insert":
-            self.create_new_ticket
-        else:
+            print('validating data')
             id = self.ticket_manager_ui.ticket_id.text()
             name = self.ticket_manager_ui.ticket_name.text()
             description = self.ticket_description.toPlainText()
@@ -340,14 +345,22 @@ class Ui_TicketWindow(object):
                 "description": f'{description}',
                 "date": f'{date}'
                         }
+            print('validating data started')
             validate(instance={id, name, description, date}, schema=ticketSchema)
+            print('validating data finished')
             self.validateJson(ticket_update)
             self.check_validity(ticketSchema)
-            requests.put(url, json=ticket_update)
-            self.refresh_ticket_window(True)
+            if self.check_validity == False:
+                return
+            else:
+                requests.put(url, json=ticket_update)
+                self.refresh_ticket_window(True)
+        else:
+            print('inserting data')
+            self.create_new_ticket
+            print('new ticket created')
             
     def validateJson(jsonData):
-
         try:
             validate(instance=jsonData, schema=ticketSchema)
             print('validated')
@@ -355,8 +368,8 @@ class Ui_TicketWindow(object):
             return False
         return True
     
-    def check_validity(jsonData):
-        isValid = validateJson(jsonData)
+    def check_validity(self, jsonData):
+        isValid = self.validateJson(jsonData)
         if isValid:
             print(jsonData)
             print('Provided JSON data is Valid')
