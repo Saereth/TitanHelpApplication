@@ -12,6 +12,7 @@ pyqt5 = "*"
 self = "*"
 sqlalchemy = "*"
 marshmallow = "*"
+jsonschema = "*"
 
 [dev-packages]
 
