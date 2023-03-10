@@ -5,6 +5,7 @@ from manage_ticket import Ui_TicketWindow
 import requests
 from backend import app
 import math
+from PyQt5.QtWidgets import QMessageBox
 import json
 
 ENDPOINT = "http://127.0.0.1:5000"
@@ -27,7 +28,15 @@ class Ui_MainWindow(object):#
         self.ticket_manager.hide()
 
     def edit_ticket(self):
+        if (self.tableWidget.currentRow() == None or self.tableWidget.currentRow() == -1):
+            self.alert("Invalid Selection","Please select a valid entry.")
+            return
+
         row = self.tableWidget.currentRow()
+        if (self.tableWidget.item(row,0) == None):
+            self.alert("Invalid Selection","Please select a valid entry.")
+            return
+        
         id = self.tableWidget.item(row,0).text()
         url = TICKETURL + "/" + str(id)
 
@@ -36,16 +45,27 @@ class Ui_MainWindow(object):#
         name = response['name']
         description = response['description']
         date = response['date']
-        print("Selected ID is:" + id, " Row is: " + str(row), "name is: " + name)
-        #TODO: Put in a check to make sure a valid row is selected before passing the id off to the api response
-        
+        print("Selected ID is:" + id, " Row is: " + str(row), "name is: " + name)       
         self.ticket_manager.show()
-        #TODO set field values in ticket_manager with the values now saverd in name/description/date/id
         self.ticket_manager_ui.ticket_id.setText(id)
         self.ticket_manager_ui.ticket_name.setText(name)
-        self.ticket_manager_ui.ticket_date.setText(date)
-        self.ticket_manager_ui.ticket_description.insertPlainText(description)
-     
+        self.ticket_manager_ui.ticket_description.setPlainText(description)
+
+    def alert(self,title,message):
+        msg = QMessageBox()
+        msg.setWindowTitle(title)
+        msg.setText(message)
+        x = msg.exec_()
+        msg.setIcon(QMessageBox.Critical)
+
+    def new_ticket(self):
+        
+        self.ticket_manager_ui.ticket_id.clear()
+        self.ticket_manager_ui.ticket_name.clear()
+        self.ticket_manager_ui.ticket_date.clear()
+        self.ticket_manager_ui.ticket_description.clear()
+        self.ticket_manager.show()
+        self.refresh_ticket_window(False)
 
     #this checks how many total tickets we have and saves it to the total_tickets variable for pagination maximums in the navigation controls
     def get_total_tickets(self):
@@ -125,17 +145,35 @@ class Ui_MainWindow(object):#
 
     def update_ticket(self):
         id = self.ticket_manager_ui.ticket_id.text()
-        name = self.ticket_manager_ui.ticket_name.displayText()
-        description = self.ticket_manager_ui.ticket_description.toPlainText()
-        date = self.ticket_manager_ui.ticket_date.displayText()
-        url = TICKETURL + "/" + str(id)
-        ticket_update = {
-            "name": f'{name}',
-            "description": f'{description}',
-            "date": f'{date}'
-                        }
-        requests.put(url, json=ticket_update)
-        self.refresh_ticket_window(True)
+
+        if (id == ""):
+            self.insert_ticket()
+        else:
+            name = self.ticket_manager_ui.ticket_name.displayText()
+            description = self.ticket_manager_ui.ticket_description.toPlainText()
+            date = self.ticket_manager_ui.ticket_date.displayText()
+            url = TICKETURL + "/" + str(id)
+            ticket_update = {
+                "name": f'{name}',
+                "description": f'{description}',
+                "date": f'{date}'
+                            }
+            requests.put(url, json=ticket_update)
+            self.refresh_ticket_window(True)
+
+    def insert_ticket(self):
+            name = self.ticket_manager_ui.ticket_name.displayText()
+            description = self.ticket_manager_ui.ticket_description.toPlainText()
+            date = self.ticket_manager_ui.ticket_date.displayText()
+            url = TICKETURL
+            new_ticket_data = {
+                "name": f'{name}',
+                "description": f'{description}',
+                "date": f'{date}'
+                            }
+            requests.post(url, json=new_ticket_data)
+            self.refresh_ticket_window(True)
+
 
     def refresh_ticket_window(self,hide=False):
         #update total ticket count
@@ -484,7 +522,7 @@ class Ui_MainWindow(object):#
         self.current_page.setAlignment(QtCore.Qt.AlignCenter)
         self.current_page.setObjectName("current_page")
         self.button_create_ticket = QtWidgets.QPushButton(self.main_frame)
-        self.button_create_ticket.clicked.connect(lambda: self.refresh_ticket_window())
+        self.button_create_ticket.clicked.connect(lambda: self.new_ticket())
         self.ticket_manager_ui.button_confirm_update.clicked.connect(lambda: self.update_ticket())
         self.button_create_ticket.setGeometry(QtCore.QRect(620, 180, 91, 31))
         self.button_create_ticket.setObjectName("button_create_ticket")
