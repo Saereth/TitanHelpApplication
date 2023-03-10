@@ -334,6 +334,8 @@ class Ui_TicketWindow(object):
             name = self.ticket_manager_ui.ticket_name.text()
             description = self.ticket_description.toPlainText()
             date = self.ticket_manager_ui.ticket_date.displayText()
+            ENDPOINT = "http://127.0.0.1:5000"
+            TICKETURL = ENDPOINT + "/ticket"
             url = TICKETURL + "/" + str(id)
             ticket_update = {
                 "name": f'{name}',
@@ -342,7 +344,7 @@ class Ui_TicketWindow(object):
                         }
             validate(instance={id, name, description, date}, schema=ticketSchema)
             self.validateJson(ticket_update)
-            self.check_validity(ticketSchema)
+            self.check_validity(self,ticketSchema)
             requests.put(url, json=ticket_update)
             self.refresh_ticket_window(True)
             
@@ -355,8 +357,8 @@ class Ui_TicketWindow(object):
             return False
         return True
     
-    def check_validity(jsonData):
-        isValid = validateJson(jsonData)
+    def check_validity(self,jsonData):
+        isValid = self.validateJson(jsonData)
         if isValid:
             print(jsonData)
             print('Provided JSON data is Valid')
